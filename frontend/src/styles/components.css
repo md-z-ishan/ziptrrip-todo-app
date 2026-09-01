@@ -10,6 +10,7 @@
   z-index: 100;
   display: flex;
   align-items: center;
+  transition: background-color 200ms ease, border-color 200ms ease;
 }
 
 .header-inner {
@@ -44,9 +45,12 @@
   font-weight: 500;
   color: var(--text-secondary);
   text-decoration: none;
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem 0.85rem;
+  min-height: 2.75rem; /* Touch friendly 44px min-height */
+  display: inline-flex;
+  align-items: center;
   border-radius: var(--radius-sm);
-  transition: color 150ms ease;
+  transition: color 150ms ease, background-color 150ms ease;
 }
 
 .nav-link:hover, .nav-link.active {
@@ -54,20 +58,24 @@
   background-color: rgba(124, 58, 237, 0.08);
 }
 
-/* Button Styling */
+/* Touch-Friendly Button Styling */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
-  min-height: 2.5rem;
+  min-height: 2.75rem; /* Touch friendly 44px target */
   border-radius: var(--radius-md);
   font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
   border: none;
-  transition: background-color 150ms ease, transform 150ms ease;
+  transition: background-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
 }
 
 .btn-primary {
@@ -123,8 +131,8 @@
 
 /* Custom Checkbox */
 .checkbox-indicator {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.5rem;
+  height: 1.5rem;
   border: 2px solid var(--border-color);
   border-radius: var(--radius-sm);
   display: flex;
@@ -141,22 +149,28 @@
   color: #FFFFFF;
 }
 
-/* Badges */
+/* Badges with Pulse Micro-interaction */
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.2rem 0.55rem;
+  padding: 0.25rem 0.625rem;
   border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 600;
   line-height: 1;
+  transition: transform 150ms ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
 }
 
 /* Search and Inputs */
 .search-bar {
   width: 100%;
-  padding: 0.625rem 1rem 0.625rem 2.5rem;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  min-height: 2.75rem;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -169,6 +183,85 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   flex-wrap: wrap;
+}
+
+/* Toast Notifications Container */
+.toast-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.875rem 1.125rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-width: 320px;
+}
+
+/* Floating Action Button (FAB) */
+.fab-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-full);
+  background-color: var(--brand-primary);
+  color: #FFFFFF;
+  border: none;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 90;
+  transition: transform 200ms ease, background-color 150ms ease;
+}
+
+.fab-btn:hover {
+  transform: scale(1.1);
+  background-color: var(--brand-primary-hover);
+}
+
+.fab-btn:active {
+  transform: scale(0.95);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.modal-content {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 520px;
+  box-shadow: var(--shadow-md);
+  padding: 1.75rem;
+  position: relative;
 }
