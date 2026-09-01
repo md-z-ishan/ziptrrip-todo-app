@@ -14,7 +14,7 @@ export function LoadingSpinner({ label = 'Loading tasks...' }) {
         color: 'var(--text-secondary)',
       }}
     >
-      <Loader2 size={32} className="animate-pulse-check" style={{ animation: 'spin 1s linear infinite' }} />
+      <Loader2 size={30} style={{ animation: 'spin 1s linear infinite' }} />
       <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{label}</span>
       <style>{`
         @keyframes spin {
@@ -22,24 +22,6 @@ export function LoadingSpinner({ label = 'Loading tasks...' }) {
           to { transform: rotate(360deg); }
         }
       `}</style>
-    </div>
-  );
-}
-
-export function LoadingSkeletons({ count = 3 }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      {Array.from({ length: count }).map((_, idx) => (
-        <div
-          key={idx}
-          className="skeleton-box"
-          style={{
-            height: '5.5rem',
-            width: '100%',
-            borderRadius: 'var(--radius-lg)',
-          }}
-        />
-      ))}
     </div>
   );
 }

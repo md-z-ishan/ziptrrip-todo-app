@@ -1,5 +1,5 @@
 import React from 'react';
-import { TodoModal } from './TodoModal';
+import { TodoModal } from './TodoModal.jsx';
 import { AlertTriangle } from 'lucide-react';
 
 export function ConfirmDelete({ isOpen, todoTitle, onConfirm, onCancel }) {

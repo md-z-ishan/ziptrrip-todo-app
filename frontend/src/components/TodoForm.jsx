@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { PRIORITIES, CATEGORIES } from '../utils/constants';
+import { PRIORITIES, CATEGORIES } from '../utils/constants.js';
 
 export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting = false }) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [priority, setPriority] = useState(initialData?.priority || 'medium');
   const [category, setCategory] = useState(initialData?.category || 'work');
-  
-  // Format initial ISO date to datetime-local string
+
+  // Format ISO date to datetime-local string
   const getFormattedDueDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -67,7 +67,7 @@ export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting 
         <input
           type="text"
           maxLength={100}
-          placeholder="e.g. Complete Ziptrip Frontend Design"
+          placeholder="e.g. Complete Ziptrip Frontend Architecture"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           style={{
@@ -87,7 +87,7 @@ export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting 
         )}
       </div>
 
-      {/* Description */}
+      {/* Description Area */}
       <div>
         <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.35rem' }}>
           Description
@@ -121,10 +121,6 @@ export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting 
               type="button"
               onClick={() => setPriority(p.id)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.4rem',
                 padding: '0.625rem',
                 borderRadius: 'var(--radius-md)',
                 border: `2px solid ${priority === p.id ? p.color : 'var(--border-color)'}`,
@@ -135,8 +131,7 @@ export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting 
                 cursor: 'pointer',
               }}
             >
-              <span>{p.icon}</span>
-              <span>{p.label}</span>
+              {p.label}
             </button>
           ))}
         </div>
@@ -154,9 +149,6 @@ export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting 
               type="button"
               onClick={() => setCategory(c.id)}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
                 padding: '0.4rem 0.75rem',
                 borderRadius: 'var(--radius-full)',
                 border: `1px solid ${category === c.id ? c.color : 'var(--border-color)'}`,
@@ -167,8 +159,7 @@ export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting 
                 cursor: 'pointer',
               }}
             >
-              <span>{c.icon}</span>
-              <span>{c.label}</span>
+              {c.label}
             </button>
           ))}
         </div>

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 export function TodoModal({ isOpen, title, onClose, children }) {
-  // Trap escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
