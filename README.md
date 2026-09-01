@@ -1,10 +1,10 @@
-# 🚀 Ziptrip Premium Todo Application
+# 🚀 Ziptrrip Premium Todo Application
 
-A **premium, interview-quality, full-stack Todo Application** built for the Ziptrip internship evaluation. Designed with custom CSS variables, dark mode, statistics dashboard, toast notifications with a 5-second **Undo Delete** grace period, debounced real-time search, category tags, priority levels, due date countdowns, and mobile responsiveness.
+A **premium, interview-quality full-stack Todo Application** built for the Ziptrrip internship evaluation. Designed with custom CSS variables, dark mode, real-time statistics dashboard, toast notifications with a 5-second **Undo Delete** grace period, debounced search, category tags, priority levels, due date countdowns, and mobile responsiveness.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Features Overview
 
 ### 🎯 Priority Levels
 - **High (🔴)**, **Medium (🟡)**, **Low (🟢)** visual indicators.
@@ -25,7 +25,7 @@ A **premium, interview-quality, full-stack Todo Application** built for the Zipt
 - Real-time overdue task warning indicator.
 
 ### 🌙 Dark Mode & Preferences
-- Theme switcher with sun/moon toggle button in header.
+- Theme switcher with Sun ☀️ / Moon 🌙 toggle button in header.
 - Persistent state saved in `localStorage`.
 - CSS variable theme system with smooth background transitions.
 
@@ -50,7 +50,7 @@ A **premium, interview-quality, full-stack Todo Application** built for the Zipt
 ## 🚀 Quick Start Guide
 
 ### 1. Installation
-Clone the repository and install dependencies for root, backend, and frontend:
+Clone the repository and install dependencies:
 ```bash
 git clone https://github.com/md-z-ishan/ziptrrip-todo-app.git
 cd ziptrrip-todo-app
@@ -77,7 +77,7 @@ ziptrrip-todo-app/
 │   ├── data/
 │   │   └── todos.json             # Atomic JSON file storage
 │   ├── middleware/
-│   │   ├── logger.js              # Request logger
+│   │   ├── errorHandler.js        # 404 & global error handling
 │   │   └── validation.js          # Payload & ID validation
 │   ├── controllers/
 │   │   └── todoController.js      # CRUD & Statistics handlers
@@ -102,11 +102,12 @@ ziptrrip-todo-app/
 
 ---
 
-## 📑 API Endpoints Overview
+## 📑 API Endpoints Summary
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/todos` | List all todos (query params: `?search=`, `?priority=`, `?category=`, `?sortBy=`) |
+| `GET` | `/api/health` | Server health status check |
+| `GET` | `/api/todos` | List all todos (query params: `?search=`, `?priority=`, `?category=`, `?completed=`) |
 | `GET` | `/api/todos/stats` | Retrieve aggregated dashboard metrics |
 | `GET` | `/api/todos/:id` | Get single todo by ID |
 | `POST` | `/api/todos` | Create a new todo |

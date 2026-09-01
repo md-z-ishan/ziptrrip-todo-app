@@ -1,36 +1,73 @@
-# 📄 Ziptrip Todo App - REST API Documentation
+# 📑 Ziptrrip Todo Application - REST API Specification
 
 Base URL: `http://localhost:5000/api`
 
 ---
 
-## 1. List All Todos
-Retrieves todos with optional filtering, search, and sorting.
+## Overview
+
+The Ziptrrip Todo API is a lightweight, high-performance RESTful service built with Node.js and Express.js, utilizing atomic file-based persistence via `todos.json`.
+
+---
+
+## 📍 API Endpoints Summary
+
+| Method | Endpoint | Description | Status Code |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/health` | Service health status check | `200 OK` |
+| `GET` | `/api/todos` | List all todos with search & filters | `200 OK` |
+| `GET` | `/api/todos/stats` | Aggregated dashboard metrics | `200 OK` |
+| `GET` | `/api/todos/:id` | Get single todo by ID | `200 OK` / `404 Not Found` |
+| `POST` | `/api/todos` | Create a new todo | `201 Created` / `400 Bad Request` |
+| `PUT` | `/api/todos/:id` | Update an existing todo | `200 OK` / `400 Bad Request` / `404 Not Found` |
+| `DELETE` | `/api/todos/:id` | Delete todo by ID | `200 OK` / `404 Not Found` |
+
+---
+
+## 1. Health Check Endpoint
+
+- **Endpoint**: `GET /api/health`
+- **Description**: Verifies if the backend Express server is running.
+
+### Response (200 OK):
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
+## 2. List All Todos (With Filters & Search)
 
 - **Endpoint**: `GET /api/todos`
 - **Query Parameters**:
-  - `search` (string): Query to filter by title or description (e.g. `?search=react`)
+  - `search` (string): Query to filter by title or description (case-insensitive). E.g. `?search=react`
   - `priority` (string): Filter by priority (`high`, `medium`, `low`, or `all`)
   - `category` (string): Filter by category (`work`, `personal`, `shopping`, `health`, `learning`, `other`, or `all`)
-  - `completed` (boolean): Filter by completion status (`true` or `false`)
-  - `sortBy` (string): Order results (`newest`, `dueDate`, `priority`)
+  - `completed` (boolean): Filter by completion state (`true` or `false`)
 
-### Example Response (200 OK):
+### Example Request:
+```http
+GET /api/todos?priority=high&category=work HTTP/1.1
+Host: localhost:5000
+```
+
+### Response (200 OK):
 ```json
 {
   "success": true,
-  "count": 2,
   "data": [
     {
       "id": "todo-1",
-      "title": "Learn React Hooks",
-      "description": "Deep dive into useState, useEffect, custom hooks, and context API",
+      "title": "Complete Ziptrrip internship assignment",
+      "description": "Build high-quality REST API backend and React frontend UI foundation",
       "priority": "high",
       "category": "work",
-      "dueDate": "2026-09-05T18:00:00.000Z",
+      "dueDate": "2026-09-02T11:00:00.000Z",
       "completed": false,
-      "createdAt": "2026-08-31T10:00:00.000Z",
-      "updatedAt": "2026-08-31T10:00:00.000Z"
+      "createdAt": "2026-09-01T09:00:00.000Z",
+      "updatedAt": "2026-09-01T09:00:00.000Z"
     }
   ]
 }
@@ -38,25 +75,57 @@ Retrieves todos with optional filtering, search, and sorting.
 
 ---
 
-## 2. Get Single Todo
-Retrieves details of a specific todo by ID.
+## 3. Get Productivity Statistics Dashboard Metrics
+
+- **Endpoint**: `GET /api/todos/stats`
+- **Description**: Returns aggregated task metrics for SVG completion rings, priority cards, and category bars.
+
+### Response (200 OK):
+```json
+{
+  "success": true,
+  "data": {
+    "total": 5,
+    "completed": 1,
+    "pending": 4,
+    "completionPercentage": 20,
+    "byPriority": {
+      "high": 2,
+      "medium": 2,
+      "low": 1
+    },
+    "byCategory": {
+      "work": 2,
+      "personal": 0,
+      "shopping": 1,
+      "health": 1,
+      "learning": 1,
+      "other": 0
+    }
+  }
+}
+```
+
+---
+
+## 4. Get Single Todo by ID
 
 - **Endpoint**: `GET /api/todos/:id`
 
-### Example Response (200 OK):
+### Response (200 OK):
 ```json
 {
   "success": true,
   "data": {
     "id": "todo-1",
-    "title": "Learn React Hooks",
-    "description": "Deep dive into useState, useEffect, custom hooks, and context API",
+    "title": "Complete Ziptrrip internship assignment",
+    "description": "Build high-quality REST API backend and React frontend UI foundation",
     "priority": "high",
     "category": "work",
-    "dueDate": "2026-09-05T18:00:00.000Z",
+    "dueDate": "2026-09-02T11:00:00.000Z",
     "completed": false,
-    "createdAt": "2026-08-31T10:00:00.000Z",
-    "updatedAt": "2026-08-31T10:00:00.000Z"
+    "createdAt": "2026-09-01T09:00:00.000Z",
+    "updatedAt": "2026-09-01T09:00:00.000Z"
   }
 }
 ```
@@ -65,22 +134,27 @@ Retrieves details of a specific todo by ID.
 ```json
 {
   "success": false,
-  "message": "Todo with ID 'todo-999' not found."
+  "message": "Todo not found."
 }
 ```
 
 ---
 
-## 3. Create Todo
-Creates a new todo item.
+## 5. Create New Todo
 
 - **Endpoint**: `POST /api/todos`
 - **Headers**: `Content-Type: application/json`
-- **Request Body**:
+- **Payload Rules**:
+  - `title` (required): string, min 3 characters after trimming.
+  - `priority` (optional): `"high"`, `"medium"` (default), or `"low"`.
+  - `category` (optional): `"work"`, `"personal"`, `"shopping"`, `"health"`, `"learning"`, or `"other"` (default).
+  - `dueDate` (optional): valid ISO 8601 date string.
+
+### Request Body:
 ```json
 {
-  "title": "Complete Ziptrip Internship Task",
-  "description": "Build interview-ready Todo application",
+  "title": "Prepare Ziptrrip Final Demo",
+  "description": "Review feature checklist and responsive design",
   "priority": "high",
   "category": "work",
   "dueDate": "2026-09-02T11:00:00.000Z"
@@ -91,32 +165,39 @@ Creates a new todo item.
 ```json
 {
   "success": true,
-  "message": "Todo created successfully",
   "data": {
-    "id": "todo-1693630000000-abc12",
-    "title": "Complete Ziptrip Internship Task",
-    "description": "Build interview-ready Todo application",
+    "id": "todo-1693630000000-a1b2c",
+    "title": "Prepare Ziptrrip Final Demo",
+    "description": "Review feature checklist and responsive design",
     "priority": "high",
     "category": "work",
     "dueDate": "2026-09-02T11:00:00.000Z",
     "completed": false,
-    "createdAt": "2026-09-02T04:30:00.000Z",
-    "updatedAt": "2026-09-02T04:30:00.000Z"
+    "createdAt": "2026-09-02T05:15:00.000Z",
+    "updatedAt": "2026-09-02T05:15:00.000Z"
   }
+}
+```
+
+### Error Response (400 Bad Request):
+```json
+{
+  "success": false,
+  "message": "Title must be at least 3 characters."
 }
 ```
 
 ---
 
-## 4. Update Todo
-Updates any field of an existing todo.
+## 6. Update Todo (Partial or Full)
 
 - **Endpoint**: `PUT /api/todos/:id`
-- **Request Body**: (Partial fields allowed)
+- **Headers**: `Content-Type: application/json`
+
+### Request Body (Partial Update):
 ```json
 {
-  "completed": true,
-  "priority": "medium"
+  "completed": true
 }
 ```
 
@@ -124,25 +205,23 @@ Updates any field of an existing todo.
 ```json
 {
   "success": true,
-  "message": "Todo updated successfully",
   "data": {
     "id": "todo-1",
-    "title": "Learn React Hooks",
-    "description": "Deep dive into useState...",
-    "priority": "medium",
+    "title": "Complete Ziptrrip internship assignment",
+    "description": "Build high-quality REST API backend and React frontend UI foundation",
+    "priority": "high",
     "category": "work",
-    "dueDate": "2026-09-05T18:00:00.000Z",
+    "dueDate": "2026-09-02T11:00:00.000Z",
     "completed": true,
-    "createdAt": "2026-08-31T10:00:00.000Z",
-    "updatedAt": "2026-09-02T04:32:00.000Z"
+    "createdAt": "2026-09-01T09:00:00.000Z",
+    "updatedAt": "2026-09-02T05:15:30.000Z"
   }
 }
 ```
 
 ---
 
-## 5. Delete Todo
-Deletes a todo item by ID.
+## 7. Delete Todo
 
 - **Endpoint**: `DELETE /api/todos/:id`
 
@@ -153,40 +232,6 @@ Deletes a todo item by ID.
   "message": "Todo deleted successfully",
   "data": {
     "id": "todo-1"
-  }
-}
-```
-
----
-
-## 6. Get Productivity Statistics
-Calculates aggregated metric counts for dashboard charts.
-
-- **Endpoint**: `GET /api/todos/stats`
-
-### Response (200 OK):
-```json
-{
-  "success": true,
-  "data": {
-    "total": 4,
-    "completed": 1,
-    "pending": 3,
-    "completionPercentage": 25,
-    "overdueCount": 1,
-    "byPriority": {
-      "high": 2,
-      "medium": 1,
-      "low": 1
-    },
-    "byCategory": {
-      "work": 2,
-      "personal": 0,
-      "shopping": 1,
-      "health": 1,
-      "learning": 0,
-      "other": 0
-    }
   }
 }
 ```
