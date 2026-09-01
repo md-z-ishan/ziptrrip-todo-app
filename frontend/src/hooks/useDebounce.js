@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 
 /**
- * Custom hook to debounce fast changing values (e.g. search query)
+ * Custom hook to debounce rapid value changes (e.g. search input query)
+ * Prevents triggering excessive API requests on every keystroke
  */
 export function useDebounce(value, delay = 300) {
   const [debouncedValue, setDebouncedValue] = useState(value);

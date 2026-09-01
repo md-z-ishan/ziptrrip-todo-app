@@ -3,35 +3,84 @@ import { Header } from '../components/Header.jsx';
 import { TodoCard } from '../components/TodoCard.jsx';
 import { EmptyState } from '../components/EmptyState.jsx';
 import { LoadingSkeleton } from '../components/LoadingSkeleton.jsx';
-import { mockTodos } from '../data/mockTodos.js';
-import { CATEGORIES, PRIORITIES } from '../utils/constants.js';
+import { TodoModal } from '../components/TodoModal.jsx';
+import { TodoForm } from '../components/TodoForm.jsx';
+import { ConfirmDelete } from '../components/ConfirmDelete.jsx';
+import { FloatingActionButton } from '../components/FloatingActionButton.jsx';
+import { useTodos } from '../hooks/useTodos.js';
+import { useDebounce } from '../hooks/useDebounce.js';
+import { CATEGORIES } from '../utils/constants.js';
 import { Search, Plus, Filter } from 'lucide-react';
 
 export function TodoList() {
-  const [todos] = useState(mockTodos);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedPriority, setSelectedPriority] = useState('all');
+  const {
+    todos,
+    loading,
+    error,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    selectedPriority,
+    createTodo,
+    updateTodo,
+    toggleComplete,
+    deleteTodoWithUndo,
+  } = useTodos();
 
-  // Filter mock todos in memory for UI presentation
-  const filteredTodos = todos.filter((todo) => {
-    const matchesSearch =
-      !searchQuery ||
-      todo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (todo.description && todo.description.toLowerCase().includes(searchQuery.toLowerCase()));
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedQuery = useDebounce(searchInput, 350);
 
-    const matchesCategory = selectedCategory === 'all' || todo.category === selectedCategory;
-    const matchesPriority = selectedPriority === 'all' || todo.priority === selectedPriority;
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingTodo, setEditingTodo] = useState(null);
+  const [deletingTodoId, setDeletingTodoId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    return matchesSearch && matchesCategory && matchesPriority;
-  });
+  // Sync debounced search input to useTodos hook
+  React.useEffect(() => {
+    setSearchQuery(debouncedQuery);
+  }, [debouncedQuery, setSearchQuery]);
+
+  const handleCreateSubmit = async (formData) => {
+    try {
+      setIsSubmitting(true);
+      await createTodo(formData);
+      setIsCreateModalOpen(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditSubmit = async (formData) => {
+    if (!editingTodo) return;
+    try {
+      setIsSubmitting(true);
+      await updateTodo(editingTodo.id, formData);
+      setEditingTodo(null);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingTodoId) {
+      deleteTodoWithUndo(deletingTodoId);
+      setDeletingTodoId(null);
+    }
+  };
+
+  const targetDeleteTodo = todos.find((t) => t.id === deletingTodoId);
 
   return (
     <div>
       <Header />
 
       <main className="container page-wrapper">
-        {/* Page Title & Supporting Text */}
+        {/* Page Title & Action Header */}
         <div style={{ marginBottom: '1.75rem', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <h1>Task Master</h1>
@@ -40,13 +89,13 @@ export function TodoList() {
             </p>
           </div>
 
-          <button className="btn btn-primary" aria-label="Add new task">
+          <button onClick={() => setIsCreateModalOpen(true)} className="btn btn-primary" aria-label="Add new task">
             <Plus size={18} />
             <span>New Task</span>
           </button>
         </div>
 
-        {/* Search & Filter Bar */}
+        {/* Search & Category Filter Controls */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ position: 'relative', width: '100%' }}>
             <Search
@@ -57,13 +106,13 @@ export function TodoList() {
               type="text"
               className="search-bar"
               placeholder="Search tasks by title or description..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               aria-label="Search tasks"
             />
           </div>
 
-          {/* Category & Priority Filters */}
+          {/* Category Filter Tabs */}
           <div className="filter-bar">
             <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
               <Filter size={14} /> Category:
@@ -94,8 +143,14 @@ export function TodoList() {
           </div>
         </div>
 
-        {/* Todo List Content */}
-        {filteredTodos.length === 0 ? (
+        {/* Live API Todo Content */}
+        {loading ? (
+          <LoadingSkeleton count={4} />
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--color-danger)' }}>
+            <p>{error}</p>
+          </div>
+        ) : todos.length === 0 ? (
           <EmptyState
             title={searchQuery ? 'No matching tasks found' : 'No tasks created yet'}
             message={
@@ -103,14 +158,59 @@ export function TodoList() {
                 ? `No tasks matched "${searchQuery}". Try clearing search or filters.`
                 : 'Create your first task and keep your day moving.'
             }
+            onAction={() => setIsCreateModalOpen(true)}
           />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-            {filteredTodos.map((todo) => (
-              <TodoCard key={todo.id} todo={todo} />
+            {todos.map((todo) => (
+              <TodoCard
+                key={todo.id}
+                todo={todo}
+                onToggleComplete={toggleComplete}
+                onEdit={(t) => setEditingTodo(t)}
+                onDelete={(id) => setDeletingTodoId(id)}
+              />
             ))}
           </div>
         )}
+
+        {/* Quick Add Floating Action Button */}
+        <FloatingActionButton onClick={() => setIsCreateModalOpen(true)} />
+
+        {/* Modal for Creating Task */}
+        <TodoModal
+          isOpen={isCreateModalOpen}
+          title="Create New Task"
+          onClose={() => setIsCreateModalOpen(false)}
+        >
+          <TodoForm
+            onSubmit={handleCreateSubmit}
+            onCancel={() => setIsCreateModalOpen(false)}
+            isSubmitting={isSubmitting}
+          />
+        </TodoModal>
+
+        {/* Modal for Editing Task */}
+        <TodoModal
+          isOpen={Boolean(editingTodo)}
+          title="Edit Task Details"
+          onClose={() => setEditingTodo(null)}
+        >
+          <TodoForm
+            initialData={editingTodo}
+            onSubmit={handleEditSubmit}
+            onCancel={() => setEditingTodo(null)}
+            isSubmitting={isSubmitting}
+          />
+        </TodoModal>
+
+        {/* Confirmation Modal for Delete */}
+        <ConfirmDelete
+          isOpen={Boolean(deletingTodoId)}
+          todoTitle={targetDeleteTodo?.title || ''}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeletingTodoId(null)}
+        />
       </main>
     </div>
   );

@@ -3,7 +3,7 @@ import axios from 'axios';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 /**
- * Pre-configured Axios instance for backend API requests
+ * Pre-configured Axios instance for Ziptrrip Todo REST API requests
  */
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -13,13 +13,12 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
-// Response interceptor for unified error formatting
+// Response interceptor to format errors into clean, readable JSON objects
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
     const formattedError = {
-      message: error.response?.data?.message || 'Network error occurred. Please try again.',
-      errors: error.response?.data?.errors || [],
+      message: error.response?.data?.message || 'Network connection failed. Please check backend server.',
       status: error.response?.status || 500,
     };
     return Promise.reject(formattedError);

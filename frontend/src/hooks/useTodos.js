@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import apiClient from '../utils/apiClient';
-import { useToast } from './useToast';
+import apiClient from '../utils/apiClient.js';
+import { useToast } from './useToast.jsx';
 
 export function useTodos() {
   const [todos, setTodos] = useState([]);
@@ -10,11 +10,10 @@ export function useTodos() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPriority, setSelectedPriority] = useState('all');
-  const [sortBy, setSortBy] = useState('newest');
   const { addToast } = useToast();
 
   /**
-   * Fetch todos with current active query filters
+   * Fetch todos from Express backend with active query filters
    */
   const fetchTodos = useCallback(async () => {
     try {
@@ -25,19 +24,18 @@ export function useTodos() {
       if (searchQuery) params.search = searchQuery;
       if (selectedCategory && selectedCategory !== 'all') params.category = selectedCategory;
       if (selectedPriority && selectedPriority !== 'all') params.priority = selectedPriority;
-      if (sortBy) params.sortBy = sortBy;
 
       const response = await apiClient.get('/todos', { params });
       setTodos(response.data || []);
     } catch (err) {
-      setError(err.message || 'Failed to fetch todos');
+      setError(err.message || 'Failed to fetch tasks from server');
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, selectedCategory, selectedPriority, sortBy]);
+  }, [searchQuery, selectedCategory, selectedPriority]);
 
   /**
-   * Fetch aggregated statistics dashboard data
+   * Fetch aggregated statistics for productivity dashboard
    */
   const fetchStats = useCallback(async () => {
     try {
@@ -54,28 +52,28 @@ export function useTodos() {
   }, [fetchTodos, fetchStats]);
 
   /**
-   * Add a new todo
+   * Create a new task
    */
   const createTodo = async (todoData) => {
     try {
       const response = await apiClient.post('/todos', todoData);
       setTodos((prev) => [response.data, ...prev]);
       fetchStats();
-      addToast({ message: '✨ Todo created successfully!', type: 'success' });
+      addToast({ message: '✨ Task created successfully!', type: 'success' });
       return response.data;
     } catch (err) {
-      addToast({ message: err.message || 'Failed to create todo', type: 'error' });
+      addToast({ message: err.message || 'Failed to create task', type: 'error' });
       throw err;
     }
   };
 
   /**
-   * Update an existing todo (Optimistic update)
+   * Update an existing task (Optimistic update)
    */
   const updateTodo = async (id, updateFields) => {
     const previousTodos = [...todos];
 
-    // Optimistic update local state
+    // Optimistic UI update
     setTodos((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...updateFields } : item))
     );
@@ -85,9 +83,9 @@ export function useTodos() {
       fetchStats();
       return response.data;
     } catch (err) {
-      // Rollback on failure
+      // Rollback state if server request fails
       setTodos(previousTodos);
-      addToast({ message: err.message || 'Failed to update todo', type: 'error' });
+      addToast({ message: err.message || 'Failed to update task', type: 'error' });
       throw err;
     }
   };
@@ -101,39 +99,39 @@ export function useTodos() {
 
     const newCompleted = !target.completed;
     await updateTodo(id, { completed: newCompleted });
-    
+
     if (newCompleted) {
-      addToast({ message: '🎉 Todo marked as completed!', type: 'success' });
+      addToast({ message: '🎉 Task marked as completed!', type: 'success' });
     }
   };
 
   /**
-   * Delete todo with 5-Second Grace Period for Undo
+   * Delete task with 5-Second Grace Period for Undo
    */
   const deleteTodoWithUndo = async (id) => {
     const targetTodo = todos.find((t) => t.id === id);
     if (!targetTodo) return;
 
-    // Immediately hide from UI
+    // Hide immediately from UI list
     setTodos((prev) => prev.filter((t) => t.id !== id));
 
     let undone = false;
 
-    // Set up 5-second timer before sending DELETE request to server
+    // Delay server DELETE call by 5 seconds
     const timeoutId = setTimeout(async () => {
       if (!undone) {
         try {
           await apiClient.delete(`/todos/${id}`);
           fetchStats();
         } catch (err) {
-          // Restore if server delete fails
+          // Restore task if server request fails
           setTodos((prev) => [...prev, targetTodo]);
-          addToast({ message: 'Failed to delete todo on server', type: 'error' });
+          addToast({ message: 'Failed to delete task on server', type: 'error' });
         }
       }
     }, 5000);
 
-    // Show Toast with Undo Button
+    // Show Toast Notification with Undo Action
     addToast({
       message: `Deleted "${targetTodo.title.slice(0, 25)}${targetTodo.title.length > 25 ? '...' : ''}"`,
       type: 'warning',
@@ -161,8 +159,6 @@ export function useTodos() {
     setSelectedCategory,
     selectedPriority,
     setSelectedPriority,
-    sortBy,
-    setSortBy,
     fetchTodos,
     fetchStats,
     createTodo,
