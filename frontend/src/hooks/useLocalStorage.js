@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 
 /**
- * Custom hook to manage persistent state in localStorage
+ * Custom hook to manage persistent state in browser localStorage
+ * @param {string} key LocalStorage key name
+ * @param {any} initialValue Default value if key does not exist
  */
 export function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = useState(() => {
