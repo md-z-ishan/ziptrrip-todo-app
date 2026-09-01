@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 const DATA_FILE_PATH = path.join(__dirname, '../data/todos.json');
 
 /**
- * Ensures the data directory and todos.json file exist.
+ * Ensures backend/data directory and todos.json file exist.
  */
 const ensureFileExists = async () => {
   try {
@@ -19,28 +19,30 @@ const ensureFileExists = async () => {
       await fs.writeFile(DATA_FILE_PATH, JSON.stringify([], null, 2), 'utf-8');
     }
   } catch (error) {
-    console.error('Error ensuring file exists:', error.message);
+    console.error('Error ensuring storage file exists:', error.message);
   }
 };
 
 /**
  * Reads all todos from JSON file.
+ * Handles missing file, corrupted JSON, or file read errors.
  * @returns {Promise<Array>} List of todo items
  */
 export const readTodos = async () => {
   await ensureFileExists();
   try {
     const content = await fs.readFile(DATA_FILE_PATH, 'utf-8');
-    return JSON.parse(content || '[]');
+    if (!content.trim()) return [];
+    return JSON.parse(content);
   } catch (error) {
-    console.error('Failed to read todos.json:', error.message);
+    console.error('Failed to read or parse todos.json:', error.message);
     return [];
   }
 };
 
 /**
- * Writes array of todos to JSON file atomically.
- * @param {Array} todos Array of todo objects to persist
+ * Writes array of todos to JSON file safely using atomic rename.
+ * @param {Array} todos Array of todo objects to write
  */
 export const writeTodos = async (todos) => {
   await ensureFileExists();
@@ -51,7 +53,7 @@ export const writeTodos = async (todos) => {
     await fs.rename(tempPath, DATA_FILE_PATH);
     return true;
   } catch (error) {
-    console.error('Failed to write todos.json:', error.message);
-    throw new Error('Database write operation failed');
+    console.error('Failed to write to todos.json:', error.message);
+    throw new Error('Storage write operation failed.');
   }
 };

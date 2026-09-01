@@ -1,63 +1,50 @@
 import { readTodos, writeTodos } from '../utils/fileStorage.js';
 
 /**
- * Helper to generate simple unique ID
+ * Generates a unique string ID for a todo
  */
-const generateId = () => `todo-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+const generateId = () => `todo-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
 
 /**
  * GET /api/todos
- * Query params: ?search=...&priority=...&category=...&sortBy=...
+ * Retrieves list of todos with combinable filters (search, priority, category, completed)
  */
 export const getAllTodos = async (req, res, next) => {
   try {
     let todos = await readTodos();
-    const { search, priority, category, completed, sortBy } = req.query;
+    const { search, priority, category, completed } = req.query;
 
-    // Filter by search string (title or description)
+    // Filter by search term (checks title and description)
     if (search && search.trim() !== '') {
-      const query = search.trim().toLowerCase();
+      const term = search.trim().toLowerCase();
       todos = todos.filter(
-        (item) =>
-          item.title.toLowerCase().includes(query) ||
-          (item.description && item.description.toLowerCase().includes(query))
+        (t) =>
+          t.title.toLowerCase().includes(term) ||
+          (t.description && t.description.toLowerCase().includes(term))
       );
     }
 
     // Filter by priority
     if (priority && priority !== 'all') {
-      todos = todos.filter((item) => item.priority?.toLowerCase() === priority.toLowerCase());
+      todos = todos.filter((t) => t.priority?.toLowerCase() === priority.toLowerCase());
     }
 
     // Filter by category
     if (category && category !== 'all') {
-      todos = todos.filter((item) => item.category?.toLowerCase() === category.toLowerCase());
+      todos = todos.filter((t) => t.category?.toLowerCase() === category.toLowerCase());
     }
 
     // Filter by completed status
     if (completed !== undefined) {
       const isCompleted = completed === 'true';
-      todos = todos.filter((item) => item.completed === isCompleted);
+      todos = todos.filter((t) => t.completed === isCompleted);
     }
 
-    // Sort todos
-    if (sortBy === 'dueDate') {
-      todos.sort((a, b) => {
-        if (!a.dueDate) return 1;
-        if (!b.dueDate) return -1;
-        return new Date(a.dueDate) - new Date(b.dueDate);
-      });
-    } else if (sortBy === 'priority') {
-      const priorityWeight = { high: 3, medium: 2, low: 1 };
-      todos.sort((a, b) => (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0));
-    } else {
-      // Default: Newer created todos first
-      todos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    }
+    // Sort newest created first by default
+    todos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     return res.status(200).json({
       success: true,
-      count: todos.length,
       data: todos,
     });
   } catch (error) {
@@ -67,7 +54,7 @@ export const getAllTodos = async (req, res, next) => {
 
 /**
  * GET /api/todos/stats
- * Generates aggregated metrics for dashboard
+ * Aggregates productivity metrics
  */
 export const getStats = async (req, res, next) => {
   try {
@@ -77,25 +64,17 @@ export const getStats = async (req, res, next) => {
     const pending = total - completed;
     const completionPercentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-    // Priority breakdown
     const byPriority = {
       high: todos.filter((t) => t.priority === 'high').length,
       medium: todos.filter((t) => t.priority === 'medium').length,
       low: todos.filter((t) => t.priority === 'low').length,
     };
 
-    // Category breakdown
     const categories = ['work', 'personal', 'shopping', 'health', 'learning', 'other'];
     const byCategory = {};
     categories.forEach((cat) => {
       byCategory[cat] = todos.filter((t) => (t.category || 'other').toLowerCase() === cat).length;
     });
-
-    // Overdue count
-    const now = new Date();
-    const overdueCount = todos.filter(
-      (t) => !t.completed && t.dueDate && new Date(t.dueDate) < now
-    ).length;
 
     return res.status(200).json({
       success: true,
@@ -104,7 +83,6 @@ export const getStats = async (req, res, next) => {
         completed,
         pending,
         completionPercentage,
-        overdueCount,
         byPriority,
         byCategory,
       },
@@ -116,18 +94,18 @@ export const getStats = async (req, res, next) => {
 
 /**
  * GET /api/todos/:id
- * Retrieve a single todo by ID
+ * Retrieves single todo item by ID
  */
 export const getTodoById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const todos = await readTodos();
-    const todo = todos.find((item) => item.id === id);
+    const todo = todos.find((t) => t.id === id);
 
     if (!todo) {
       return res.status(404).json({
         success: false,
-        message: `Todo with ID '${id}' not found.`,
+        message: 'Todo not found.',
       });
     }
 
@@ -142,11 +120,11 @@ export const getTodoById = async (req, res, next) => {
 
 /**
  * POST /api/todos
- * Create a new todo
+ * Creates a new todo item
  */
 export const createTodo = async (req, res, next) => {
   try {
-    const { title, description = '', priority = 'medium', category = 'work', dueDate = null } = req.body;
+    const { title, description = '', priority = 'medium', category = 'other', dueDate = null } = req.body;
 
     const todos = await readTodos();
     const now = new Date().toISOString();
@@ -168,7 +146,6 @@ export const createTodo = async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      message: 'Todo created successfully',
       data: newTodo,
     });
   } catch (error) {
@@ -184,20 +161,20 @@ export const updateTodo = async (req, res, next) => {
   try {
     const { id } = req.params;
     const todos = await readTodos();
-    const index = todos.findIndex((item) => item.id === id);
+    const index = todos.findIndex((t) => t.id === id);
 
     if (index === -1) {
       return res.status(404).json({
         success: false,
-        message: `Todo with ID '${id}' not found.`,
+        message: 'Todo not found.',
       });
     }
 
-    const currentTodo = todos[index];
+    const existing = todos[index];
     const { title, description, priority, category, dueDate, completed } = req.body;
 
     const updatedTodo = {
-      ...currentTodo,
+      ...existing,
       ...(title !== undefined && { title: title.trim() }),
       ...(description !== undefined && { description: description.trim() }),
       ...(priority !== undefined && { priority: priority.toLowerCase() }),
@@ -212,7 +189,6 @@ export const updateTodo = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Todo updated successfully',
       data: updatedTodo,
     });
   } catch (error) {
@@ -222,28 +198,28 @@ export const updateTodo = async (req, res, next) => {
 
 /**
  * DELETE /api/todos/:id
- * Delete todo by ID
+ * Deletes a todo item by ID
  */
 export const deleteTodo = async (req, res, next) => {
   try {
     const { id } = req.params;
     const todos = await readTodos();
-    const index = todos.findIndex((item) => item.id === id);
+    const index = todos.findIndex((t) => t.id === id);
 
     if (index === -1) {
       return res.status(404).json({
         success: false,
-        message: `Todo with ID '${id}' not found.`,
+        message: 'Todo not found.',
       });
     }
 
-    const [deletedTodo] = todos.splice(index, 1);
+    todos.splice(index, 1);
     await writeTodos(todos);
 
     return res.status(200).json({
       success: true,
       message: 'Todo deleted successfully',
-      data: deletedTodo,
+      data: { id },
     });
   } catch (error) {
     next(error);
