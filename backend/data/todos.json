@@ -1,0 +1,46 @@
+[
+  {
+    "id": "todo-1",
+    "title": "Learn React Hooks",
+    "description": "Deep dive into useState, useEffect, custom hooks, and context API",
+    "priority": "high",
+    "category": "work",
+    "dueDate": "2026-09-05T18:00:00.000Z",
+    "completed": false,
+    "createdAt": "2026-08-31T10:00:00.000Z",
+    "updatedAt": "2026-08-31T10:00:00.000Z"
+  },
+  {
+    "id": "todo-2",
+    "title": "Buy Groceries for the Week",
+    "description": "Fresh vegetables, milk, eggs, bread, and fruits",
+    "priority": "medium",
+    "category": "shopping",
+    "dueDate": "2026-09-03T12:00:00.000Z",
+    "completed": true,
+    "createdAt": "2026-08-30T14:00:00.000Z",
+    "updatedAt": "2026-08-31T09:00:00.000Z"
+  },
+  {
+    "id": "todo-3",
+    "title": "Evening Cardio & Fitness",
+    "description": "30 minutes treadmill run and core strength workout",
+    "priority": "low",
+    "category": "health",
+    "dueDate": "2026-09-02T19:00:00.000Z",
+    "completed": false,
+    "createdAt": "2026-09-01T08:00:00.000Z",
+    "updatedAt": "2026-09-01T08:00:00.000Z"
+  },
+  {
+    "id": "todo-4",
+    "title": "Prepare Ziptrip Internship Demo",
+    "description": "Finalize feature checklist, responsive design, dark mode, and documentation",
+    "priority": "high",
+    "category": "work",
+    "dueDate": "2026-09-02T11:00:00.000Z",
+    "completed": false,
+    "createdAt": "2026-09-01T09:00:00.000Z",
+    "updatedAt": "2026-09-01T09:00:00.000Z"
+  }
+]
