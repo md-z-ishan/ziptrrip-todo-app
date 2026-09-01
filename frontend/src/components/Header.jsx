@@ -1,12 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { CheckSquare, Sun, Moon } from 'lucide-react';
+import { CheckSquare, Sun, Moon, Download, Upload } from 'lucide-react';
 import { useLocalStorage } from '../hooks/useLocalStorage.js';
 import { applyTheme } from '../utils/themes.js';
+import { exportTodosToJson, importTodosFromJson } from '../utils/backup.js';
+import { useToast } from '../hooks/useToast.jsx';
 
-export function Header() {
+export function Header({ todos = [], onImportSuccess }) {
   const location = useLocation();
   const [theme, setTheme] = useLocalStorage('ziptrip_theme', 'dark');
+  const fileInputRef = useRef(null);
+  const { addToast } = useToast();
 
   useEffect(() => {
     applyTheme(theme);
@@ -18,6 +22,32 @@ export function Header() {
     applyTheme(nextTheme);
   };
 
+  const handleExport = () => {
+    if (!todos || todos.length === 0) {
+      addToast({ message: 'No tasks available to export', type: 'info' });
+      return;
+    }
+    exportTodosToJson(todos);
+    addToast({ message: '📥 Todos exported to JSON file!', type: 'success' });
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const importedData = await importTodosFromJson(file);
+      if (onImportSuccess) {
+        onImportSuccess(importedData);
+      }
+      addToast({ message: `📤 Successfully imported ${importedData.length} tasks!`, type: 'success' });
+    } catch (err) {
+      addToast({ message: err.message || 'Failed to import JSON file', type: 'error' });
+    } finally {
+      e.target.value = '';
+    }
+  };
+
   return (
     <header className="app-header">
       <div className="container header-inner">
@@ -27,8 +57,17 @@ export function Header() {
           <span>TaskMaster</span>
         </Link>
 
-        {/* Navigation & Theme Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {/* Hidden File Input for Import */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept=".json"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
+
+        {/* Actions & Navigation */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
           <nav className="header-nav" aria-label="Main Navigation">
             <Link
               to="/todos"
@@ -38,6 +77,28 @@ export function Header() {
             </Link>
           </nav>
 
+          {/* Export JSON Button */}
+          <button
+            onClick={handleExport}
+            className="btn btn-secondary"
+            style={{ padding: '0.4rem 0.65rem', fontSize: '0.78125rem', minHeight: '2.25rem' }}
+            title="Export tasks as JSON backup file"
+          >
+            <Download size={14} />
+            <span className="brand-title-text">Export</span>
+          </button>
+
+          {/* Import JSON Button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="btn btn-secondary"
+            style={{ padding: '0.4rem 0.65rem', fontSize: '0.78125rem', minHeight: '2.25rem' }}
+            title="Import tasks from JSON backup file"
+          >
+            <Upload size={14} />
+            <span className="brand-title-text">Import</span>
+          </button>
+
           {/* Dark Mode Toggle Button */}
           <button
             onClick={toggleTheme}
@@ -45,8 +106,8 @@ export function Header() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '2.5rem',
-              height: '2.5rem',
+              width: '2.35rem',
+              height: '2.35rem',
               borderRadius: 'var(--radius-full)',
               border: '1px solid var(--border-color)',
               backgroundColor: 'var(--bg-card)',
