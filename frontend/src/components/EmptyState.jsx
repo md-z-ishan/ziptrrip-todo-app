@@ -1,7 +1,11 @@
 import React from 'react';
 import { ClipboardList, Plus } from 'lucide-react';
 
-export function EmptyState({ title = 'No todos found!', message = 'Get started by creating your first task.', onAction }) {
+export function EmptyState({
+  title = 'No tasks yet',
+  message = 'Create your first task and keep your day moving.',
+  onAction,
+}) {
   return (
     <div
       className="animate-fade-in"
@@ -10,39 +14,38 @@ export function EmptyState({ title = 'No todos found!', message = 'Get started b
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '4rem 1.5rem',
+        padding: '3.5rem 1.5rem',
         textAlign: 'center',
         backgroundColor: 'var(--bg-card)',
-        border: '1px border-dashed var(--border-color)',
+        border: '1px dashed var(--border-color)',
         borderRadius: 'var(--radius-lg)',
-        boxShadow: 'var(--shadow-sm)',
       }}
     >
       <div
         style={{
-          width: '4rem',
-          height: '4rem',
-          borderRadius: '50%',
-          backgroundColor: 'rgba(124, 58, 237, 0.12)',
+          width: '3.5rem',
+          height: '3.5rem',
+          borderRadius: 'var(--radius-full)',
+          backgroundColor: 'rgba(124, 58, 237, 0.1)',
           color: 'var(--brand-primary)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '1.25rem',
+          marginBottom: '1rem',
         }}
       >
-        <ClipboardList size={36} />
+        <ClipboardList size={30} />
       </div>
 
-      <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>{title}</h3>
-      <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', maxWidth: '360px', marginBottom: '1.5rem' }}>
+      <h3 style={{ fontSize: '1.15rem', fontWeight: 600, marginBottom: '0.35rem' }}>{title}</h3>
+      <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', maxWidth: '320px', marginBottom: '1.25rem' }}>
         {message}
       </p>
 
       {onAction && (
         <button onClick={onAction} className="btn btn-primary">
-          <Plus size={18} />
-          <span>Create New Task</span>
+          <Plus size={16} />
+          <span>New Task</span>
         </button>
       )}
     </div>

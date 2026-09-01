@@ -1,342 +1,193 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import apiClient from '../utils/apiClient';
-import { useToast } from '../hooks/useToast';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ConfirmDelete } from '../components/ConfirmDelete';
-import { PRIORITIES, CATEGORIES } from '../utils/constants';
-import { formatDate, getDueDateStatus } from '../utils/helpers';
-import { ArrowLeft, CheckCircle, Clock, Trash2, Save, Calendar, Tag, Flag } from 'lucide-react';
+import { Header } from '../components/Header.jsx';
+import { mockTodos } from '../data/mockTodos.js';
+import { formatDate, getPriorityInfo, getCategoryInfo, getDueDateLabel } from '../utils/helpers.js';
+import { ArrowLeft, Edit3, Trash2, Calendar, Tag, Flag, Clock, AlertCircle } from 'lucide-react';
 
 export function TodoDetail() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
   const navigate = useNavigate();
-  const { addToast } = useToast();
 
-  const [todo, setTodo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // Find todo in mock dataset
+  const todo = mockTodos.find((item) => item.id === id);
 
-  // Edit fields state
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState('medium');
-  const [category, setCategory] = useState('work');
-  const [dueDate, setDueDate] = useState('');
-  const [completed, setCompleted] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  useEffect(() => {
-    if (!id) {
-      setError('No task ID provided');
-      setLoading(false);
-      return;
-    }
-
-    const fetchDetail = async () => {
-      try {
-        setLoading(true);
-        const response = await apiClient.get(`/todos/${id}`);
-        const data = response.data;
-        setTodo(data);
-        setTitle(data.title || '');
-        setDescription(data.description || '');
-        setPriority(data.priority || 'medium');
-        setCategory(data.category || 'work');
-        setCompleted(data.completed || false);
-        setDueDate(data.dueDate ? new Date(data.dueDate).toISOString().slice(0, 16) : '');
-      } catch (err) {
-        setError(err.message || 'Task not found');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDetail();
-  }, [id]);
-
-  const handleSave = async () => {
-    if (!title.trim() || title.trim().length < 3) {
-      addToast({ message: 'Title must be at least 3 characters', type: 'error' });
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      const payload = {
-        title: title.trim(),
-        description: description.trim(),
-        priority,
-        category,
-        completed,
-        dueDate: dueDate ? new Date(dueDate).toISOString() : null,
-      };
-
-      const response = await apiClient.put(`/todos/${id}`, payload);
-      setTodo(response.data);
-      addToast({ message: '✨ Task updated successfully!', type: 'success' });
-    } catch (err) {
-      addToast({ message: err.message || 'Failed to update task', type: 'error' });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      await apiClient.delete(`/todos/${id}`);
-      addToast({ message: 'Task deleted successfully', type: 'info' });
-      navigate('/');
-    } catch (err) {
-      addToast({ message: err.message || 'Failed to delete task', type: 'error' });
-    }
-  };
-
-  const dueDateStatus = getDueDateStatus(todo?.dueDate, completed);
-
-  if (loading) return <LoadingSpinner label="Loading task details..." />;
-
-  if (error || !todo) {
+  if (!todo) {
     return (
-      <main className="container page-wrapper" style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-        <h2 style={{ marginBottom: '1rem', color: 'var(--color-danger)' }}>{error || 'Task Not Found'}</h2>
-        <Link to="/" className="btn btn-primary">
-          <ArrowLeft size={18} />
-          <span>Back to Tasks</span>
-        </Link>
-      </main>
+      <div>
+        <Header />
+        <main className="container page-wrapper" style={{ textAlign: 'center', paddingTop: '6rem' }}>
+          <div
+            style={{
+              maxWidth: '420px',
+              margin: '0 auto',
+              padding: '2.5rem 1.5rem',
+              backgroundColor: 'var(--bg-card)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--border-color)',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+          >
+            <div
+              style={{
+                width: '3.5rem',
+                height: '3.5rem',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: 'var(--color-danger)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem auto',
+              }}
+            >
+              <AlertCircle size={30} />
+            </div>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Task Not Found</h2>
+            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+              The requested task with ID <code>{id || 'null'}</code> could not be found or has been removed.
+            </p>
+            <Link to="/todos" className="btn btn-primary">
+              <ArrowLeft size={16} />
+              <span>Return to Tasks</span>
+            </Link>
+          </div>
+        </main>
+      </div>
     );
   }
 
+  const priorityInfo = getPriorityInfo(todo.priority);
+  const categoryInfo = getCategoryInfo(todo.category);
+  const dueDateLabel = getDueDateLabel(todo.dueDate, todo.completed);
+
   return (
-    <main className="container page-wrapper">
-      {/* Top Back Navigation Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-        <button
-          onClick={() => navigate('/')}
-          className="btn btn-secondary"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
-        >
-          <ArrowLeft size={18} />
-          <span>Back to Task List</span>
-        </button>
+    <div>
+      <Header />
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button onClick={() => setShowDeleteConfirm(true)} className="btn btn-danger">
-            <Trash2 size={16} />
-            <span>Delete</span>
+      <main className="container page-wrapper">
+        {/* Navigation Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <button onClick={() => navigate('/todos')} className="btn btn-secondary" aria-label="Back to tasks list">
+            <ArrowLeft size={16} />
+            <span>Back to Tasks</span>
           </button>
-          <button onClick={handleSave} disabled={isSaving} className="btn btn-primary">
-            <Save size={16} />
-            <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
-          </button>
+
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button className="btn btn-secondary" aria-label="Edit task">
+              <Edit3 size={16} />
+              <span>Edit</span>
+            </button>
+            <button className="btn btn-secondary" style={{ color: 'var(--color-danger)', borderColor: 'var(--border-color)' }} aria-label="Delete task">
+              <Trash2 size={16} />
+              <span>Delete</span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Main Detail Container Card */}
-      <div
-        style={{
-          backgroundColor: 'var(--bg-card)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '2rem',
-          boxShadow: 'var(--shadow-md)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem',
-        }}
-      >
-        {/* Status Toggle Header Banner */}
+        {/* Task Detail Card */}
         <div
           style={{
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '2rem',
+            boxShadow: 'var(--shadow-sm)',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '1rem 1.25rem',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: completed ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-primary)',
-            border: `1px solid ${completed ? 'var(--color-success)' : 'var(--border-color)'}`,
-            flexWrap: 'wrap',
-            gap: '1rem',
+            flexDirection: 'column',
+            gap: '1.5rem',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <button
-              onClick={() => setCompleted(!completed)}
-              className="custom-checkbox"
-              style={{ width: '1.75rem', height: '1.75rem' }}
-              aria-label="Toggle completed"
-            >
-              {completed && '✓'}
-            </button>
-            <span style={{ fontWeight: 600, fontSize: '1rem', color: completed ? 'var(--color-success)' : 'var(--text-primary)' }}>
-              {completed ? '🎉 Task Completed' : '⏳ Task Pending'}
+          {/* Status Header Banner */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.875rem 1.25rem',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: todo.completed ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-primary)',
+              border: `1px solid ${todo.completed ? 'var(--color-success)' : 'var(--border-color)'}`,
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+            }}
+          >
+            <span style={{ fontWeight: 600, fontSize: '0.95rem', color: todo.completed ? 'var(--color-success)' : 'var(--text-primary)' }}>
+              {todo.completed ? '✓ Task Completed' : '⏳ Task Pending'}
             </span>
+
+            {dueDateLabel && (
+              <span className="badge" style={{ color: dueDateLabel.color, backgroundColor: dueDateLabel.bgColor }}>
+                <Calendar size={12} />
+                {dueDateLabel.text}
+              </span>
+            )}
           </div>
 
-          {dueDateStatus && (
-            <span className="badge" style={{ color: dueDateStatus.color, backgroundColor: dueDateStatus.bgColor, fontSize: '0.85rem' }}>
-              <Calendar size={14} />
-              {dueDateStatus.text}
-            </span>
-          )}
-        </div>
-
-        {/* Title Input Field */}
-        <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-            Task Title
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{
-              width: '100%',
-              fontSize: '1.35rem',
-              fontWeight: 700,
-              padding: '0.625rem 0.875rem',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-color)',
-              backgroundColor: 'var(--bg-primary)',
-              color: 'var(--text-primary)',
-            }}
-          />
-        </div>
-
-        {/* Description Field */}
-        <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-            Description
-          </label>
-          <textarea
-            rows={5}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Add detailed notes, links, or subtasks..."
-            style={{
-              width: '100%',
-              padding: '0.75rem 0.875rem',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-color)',
-              backgroundColor: 'var(--bg-primary)',
-              color: 'var(--text-primary)',
-              lineHeight: 1.6,
-            }}
-          />
-        </div>
-
-        {/* Priority & Category Pickers */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
-          {/* Priority */}
+          {/* Title */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-              <Flag size={14} style={{ display: 'inline', marginRight: '0.3rem' }} />
-              Priority Level
-            </label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              {PRIORITIES.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => setPriority(p.id)}
-                  style={{
-                    flex: 1,
-                    padding: '0.5rem',
-                    borderRadius: 'var(--radius-md)',
-                    border: `2px solid ${priority === p.id ? p.color : 'var(--border-color)'}`,
-                    backgroundColor: priority === p.id ? p.bgColor : 'var(--bg-primary)',
-                    color: priority === p.id ? p.color : 'var(--text-primary)',
-                    fontWeight: 600,
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {p.icon} {p.label}
-                </button>
-              ))}
+            <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{todo.title}</h1>
+            <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              {todo.description || 'No additional description provided.'}
+            </p>
+          </div>
+
+          {/* Metadata Badges Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', paddingTop: '0.5rem' }}>
+            {/* Priority */}
+            <div>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '0.35rem' }}>
+                Priority Level
+              </span>
+              <span className="badge" style={{ color: priorityInfo.color, backgroundColor: priorityInfo.bgColor, fontSize: '0.85rem', padding: '0.3rem 0.75rem' }}>
+                <Flag size={14} />
+                {priorityInfo.label}
+              </span>
+            </div>
+
+            {/* Category */}
+            <div>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '0.35rem' }}>
+                Category Tag
+              </span>
+              <span className="badge" style={{ color: categoryInfo.color, backgroundColor: categoryInfo.bgColor, fontSize: '0.85rem', padding: '0.3rem 0.75rem' }}>
+                <Tag size={14} />
+                {categoryInfo.label}
+              </span>
+            </div>
+
+            {/* Due Date */}
+            <div>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '0.35rem' }}>
+                Due Date
+              </span>
+              <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>
+                {formatDate(todo.dueDate)}
+              </span>
             </div>
           </div>
 
-          {/* Category */}
-          <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-              <Tag size={14} style={{ display: 'inline', marginRight: '0.3rem' }} />
-              Category Tag
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.625rem 0.875rem',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-primary)',
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-              }}
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.icon} {c.label}
-                </option>
-              ))}
-            </select>
+          {/* Timestamps Footer */}
+          <div
+            style={{
+              borderTop: '1px solid var(--border-color)',
+              paddingTop: '1rem',
+              marginTop: '0.5rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '0.78125rem',
+              color: 'var(--text-muted)',
+              flexWrap: 'wrap',
+              gap: '0.5rem',
+            }}
+          >
+            <span>ID: <code>{todo.id}</code></span>
+            <span>Created: {formatDate(todo.createdAt)}</span>
+            <span>Updated: {formatDate(todo.updatedAt)}</span>
           </div>
         </div>
-
-        {/* Due Date Input */}
-        <div>
-          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-            <Calendar size={14} style={{ display: 'inline', marginRight: '0.3rem' }} />
-            Due Date & Time
-          </label>
-          <input
-            type="datetime-local"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            style={{
-              width: '100%',
-              maxWidth: '320px',
-              padding: '0.625rem 0.875rem',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-color)',
-              backgroundColor: 'var(--bg-primary)',
-              color: 'var(--text-primary)',
-            }}
-          />
-        </div>
-
-        {/* Timestamps Info Footer */}
-        <div
-          style={{
-            borderTop: '1px solid var(--border-color)',
-            paddingTop: '1rem',
-            marginTop: '1rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-            fontSize: '0.75rem',
-            color: 'var(--text-muted)',
-            flexWrap: 'wrap',
-            gap: '0.5rem',
-          }}
-        >
-          <span>ID: <code>{todo.id}</code></span>
-          <span>Created: {formatDate(todo.createdAt)}</span>
-          <span>Last Updated: {formatDate(todo.updatedAt)}</span>
-        </div>
-      </div>
-
-      {/* Delete Confirmation Modal */}
-      <ConfirmDelete
-        isOpen={showDeleteConfirm}
-        todoTitle={todo.title}
-        onConfirm={handleDelete}
-        onCancel={() => setShowDeleteConfirm(false)}
-      />
-    </main>
+      </main>
+    </div>
   );
 }
