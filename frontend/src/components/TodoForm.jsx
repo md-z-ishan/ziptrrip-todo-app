@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { PRIORITIES, CATEGORIES } from '../utils/constants.js';
+import { Plus, X, CheckSquare } from 'lucide-react';
 
 export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting = false }) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [priority, setPriority] = useState(initialData?.priority || 'medium');
   const [category, setCategory] = useState(initialData?.category || 'work');
+  const [subtasks, setSubtasks] = useState(initialData?.subtasks || []);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
 
   // Format ISO date to datetime-local string
   const getFormattedDueDate = (dateString) => {
@@ -25,8 +28,28 @@ export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting 
       setPriority(initialData.priority || 'medium');
       setCategory(initialData.category || 'work');
       setDueDate(getFormattedDueDate(initialData.dueDate));
+      setSubtasks(initialData.subtasks || []);
     }
   }, [initialData]);
+
+  const handleAddSubtask = () => {
+    if (!newSubtaskTitle.trim()) return;
+    setSubtasks((prev) => [
+      ...prev,
+      { id: `sub-${Date.now()}`, title: newSubtaskTitle.trim(), completed: false },
+    ]);
+    setNewSubtaskTitle('');
+  };
+
+  const handleRemoveSubtask = (subId) => {
+    setSubtasks((prev) => prev.filter((s) => s.id !== subId));
+  };
+
+  const handleToggleSubtask = (subId) => {
+    setSubtasks((prev) =>
+      prev.map((s) => (s.id === subId ? { ...s, completed: !s.completed } : s))
+    );
+  };
 
   const validate = () => {
     const newErrors = {};
@@ -48,6 +71,7 @@ export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting 
       description: description.trim(),
       priority,
       category,
+      subtasks,
       dueDate: dueDate ? new Date(dueDate).toISOString() : null,
     });
   };
@@ -107,6 +131,77 @@ export function TodoForm({ initialData = null, onSubmit, onCancel, isSubmitting 
             resize: 'vertical',
           }}
         />
+      </div>
+
+      {/* Subtasks / Checklist Items */}
+      <div>
+        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.35rem' }}>
+          Subtasks Checklist ({subtasks.filter((s) => s.completed).length}/{subtasks.length})
+        </label>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+          <input
+            type="text"
+            placeholder="Add subtask item..."
+            value={newSubtaskTitle}
+            onChange={(e) => setNewSubtaskTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleAddSubtask();
+              }
+            }}
+            style={{
+              flex: 1,
+              padding: '0.45rem 0.75rem',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--bg-primary)',
+              color: 'var(--text-primary)',
+              fontSize: '0.85rem',
+            }}
+          />
+          <button type="button" onClick={handleAddSubtask} className="btn btn-secondary" style={{ padding: '0.45rem 0.75rem', minHeight: 'auto' }}>
+            <Plus size={16} />
+            <span>Add</span>
+          </button>
+        </div>
+
+        {subtasks.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '140px', overflowY: 'auto' }}>
+            {subtasks.map((st) => (
+              <div
+                key={st.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.35rem 0.6rem',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: 'var(--bg-primary)',
+                  border: '1px solid var(--border-color)',
+                  fontSize: '0.85rem',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={st.completed}
+                  onChange={() => handleToggleSubtask(st.id)}
+                  style={{ cursor: 'pointer' }}
+                />
+                <span style={{ flex: 1, textDecoration: st.completed ? 'line-through' : 'none', color: st.completed ? 'var(--text-muted)' : 'var(--text-primary)' }}>
+                  {st.title}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveSubtask(st.id)}
+                  style={{ background: 'none', border: 'none', color: 'var(--color-danger)', cursor: 'pointer', padding: '0.1rem' }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Priority Selector */}

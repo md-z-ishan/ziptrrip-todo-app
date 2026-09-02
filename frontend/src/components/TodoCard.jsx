@@ -1,16 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Tag, Flag, Check } from 'lucide-react';
+import { Calendar, Tag, Flag, Check, CheckSquare } from 'lucide-react';
 import { getPriorityInfo, getCategoryInfo, getDueDateLabel } from '../utils/helpers.js';
 
-export function TodoCard({ todo }) {
+export function TodoCard({ todo, onToggleComplete, onEdit, onDelete }) {
   const navigate = useNavigate();
 
   const priorityInfo = getPriorityInfo(todo.priority);
   const categoryInfo = getCategoryInfo(todo.category);
   const dueDateLabel = getDueDateLabel(todo.dueDate, todo.completed);
 
-  const handleCardClick = () => {
+  const subtasks = todo.subtasks || [];
+  const completedSubtasksCount = subtasks.filter((s) => s.completed).length;
+
+  const handleCardClick = (e) => {
+    if (e.target.closest('.interactive-action')) return;
     navigate(`/todos?id=${todo.id}`);
   };
 
@@ -22,16 +26,20 @@ export function TodoCard({ todo }) {
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          handleCardClick();
+          handleCardClick(e);
         }
       }}
     >
       {/* Completion Indicator */}
-      <div
-        className={`checkbox-indicator ${todo.completed ? 'checked' : ''}`}
-        aria-label={`Task is ${todo.completed ? 'completed' : 'pending'}`}
-      >
-        {todo.completed && <Check size={14} />}
+      <div className="interactive-action" style={{ paddingTop: '0.1rem' }}>
+        <input
+          type="checkbox"
+          checked={todo.completed}
+          onChange={() => onToggleComplete && onToggleComplete(todo.id)}
+          className="checkbox-indicator checked"
+          style={{ width: '1.35rem', height: '1.35rem', cursor: 'pointer' }}
+          aria-label={`Mark task as ${todo.completed ? 'incomplete' : 'complete'}`}
+        />
       </div>
 
       {/* Main Details */}
@@ -53,6 +61,14 @@ export function TodoCard({ todo }) {
           >
             {todo.description}
           </p>
+        )}
+
+        {/* Subtasks Progress Indicator */}
+        {subtasks.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>
+            <CheckSquare size={12} color="var(--brand-primary)" />
+            <span>{completedSubtasksCount} of {subtasks.length} subtasks done</span>
+          </div>
         )}
 
         {/* Badges Footer */}
