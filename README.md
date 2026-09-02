@@ -1,74 +1,70 @@
-# 🎯 Ziptrrip Premium Todo Application
+# 🎯 Ziptrrip Todo App
 
-> **Official Internship Coding Challenge Submission for Ziptrrip**  
-> **GitHub Repository**: [https://github.com/md-z-ishan/ziptrrip-todo-app.git](https://github.com/md-z-ishan/ziptrrip-todo-app.git)
+A **premium, interview-quality full-stack Todo Application** built specifically for the **Ziptrrip Tech Challenge**. Designed with React 18, Node.js & Express.js, custom CSS variable design tokens, dark mode, productivity statistics dashboard, toast notifications with 5-second **Undo Delete** grace period, debounced search, category tags, priority levels, due date countdowns, and mobile responsiveness.
 
----
-
-## 📌 Executive Summary & Qualifying Compliance
-
-This project is a **full-stack, interview-grade Todo Application** built specifically for the **Ziptrrip Tech Challenge**. It satisfies 100% of the qualifying requirements:
-
-1. **Multi-Page React Frontend**: Built with React 18 & React Router v6.
-   - **Page 1 (Task List)**: `http://localhost:3000/todos` — Interactive list, search, category pills, priority selectors, dark mode, statistics dashboard, and deletion undo.
-   - **Page 2 (Single Task Detail)**: `http://localhost:3000/todos?id=<todo-id>` — Query parameter based route displaying complete task metadata, edit controls, timestamps, and return navigation.
-2. **Node.js + Express.js Backend**: REST API with full CRUD endpoints and atomic file-based persistence (`backend/data/todos.json`).
-3. **Documentation in `.md` Files**: Complete documentation in `README.md` and `ENDPOINTS.md`.
+> **Official Repository**: [https://github.com/md-z-ishan/ziptrrip-todo-app.git](https://github.com/md-z-ishan/ziptrrip-todo-app.git)
 
 ---
 
-## 🌟 Comprehensive Feature Matrix
+## 🌟 Features
 
-### 1. 🔀 Multi-Page Query-Param Routing
-- **/todos**: Main task management interface.
-- **/todos?id=:id**: Single task detail view that reads the `id` query parameter using `URLSearchParams`.
-- **404 Handling**: Invalid task IDs (e.g. `/todos?id=invalid`) display a clean "Task Not Found" state with return navigation.
+### 🔀 Multi-Page Query-Param Routing
+- **/todos**: Main task management dashboard.
+- **/todos?id=:id**: Single task detail route that reads the `id` query parameter using `URLSearchParams`. Displays title, description, completion status, priority badge, category badge, due date, and timestamps (`createdAt`, `updatedAt`).
 
-### 2. 🎯 Priority Levels
+### 🎯 Priority Levels
 - **High (🔴)**, **Medium (🟡)**, and **Low (🟢)** visual indicators on cards and detail view.
-- Real-time priority filtering and sorting.
+- Filter and sort tasks by priority level.
 
-### 3. 📅 Due Dates & Overdue Warnings
+### 📅 Due Dates & Overdue Warnings
 - Add due date & time when creating or editing tasks.
 - Dynamic status badges: `"Due in X days"`, `"Due today"`, or `"Overdue by X days"` with warning colors.
 
-### 4. 📂 Categories & Tags
+### 📂 Categories & Tags
 - 6 predefined categories: **Work 💼**, **Personal 👤**, **Shopping 🛒**, **Health 💪**, **Learning 📚**, **Other 📌**.
 - Category filter tabs with real-time task counts.
 
-### 5. 📊 Productivity Statistics Dashboard
+### 📊 Productivity Statistics Dashboard
 - **SVG Circular Progress Chart** showing overall completion percentage.
-- Priority level mini cards (High/Medium/Low counts).
+- Priority level breakdown mini cards (High/Medium/Low counts).
 - Category distribution horizontal bar chart.
 - Real-time overdue task warning indicator.
 
-### 6. 🌙 Dark Mode & Preferences Persistence
+### 🌙 Dark Mode & Preferences Persistence
 - Sun ☀️ / Moon 🌙 theme toggle button in header.
 - Persistent state saved in browser `localStorage`.
 - CSS variable theme system with smooth background color transitions.
 
-### 7. 🔔 Toast Notifications & 5-Second Undo Grace Period
+### 🔔 Toast Notifications & 5-Second Undo Grace Period
 - Interactive toast alerts for creation, edits, and deletions.
 - **5-second grace period for Undo** on task deletion before persisting to server.
 
-### 8. 📥 JSON Backup Export & Import
+### 📥 JSON Backup Export & Import
 - One-click **Export JSON** button in header to download all task data as a `.json` backup file.
 - One-click **Import JSON** button to restore task backups instantly.
 
-### 9. 📱 Responsive Design & Accessibility (A11y)
+### 📱 Responsive Design & Accessibility (A11y)
 - Mobile-first responsive breakpoints (**390px mobile** $\rightarrow$ **768px tablet** $\rightarrow$ **1440px desktop**).
 - **0 horizontal overflow on 390px mobile viewports**.
 - ARIA focus rings, keyboard tab navigation (`tabIndex={0}`), and minimum 44px touch targets.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## 🛠️ Tech Stack
+
+- **Frontend**: React 18, React Router v6, Custom CSS Variables (Design Tokens), Axios, Lucide Icons, Vite
+- **Backend**: Node.js, Express.js, CORS, Dotenv, Request Logger Middleware
+- **Database**: Atomic JSON file storage (`backend/data/todos.json`)
+
+---
+
+## 📁 Project Structure
 
 ```
 ziptrrip-todo-app/
 ├── backend/
 │   ├── data/
-│   │   └── todos.json             # Persistent JSON file storage
+│   │   └── todos.json             # Atomic JSON file storage
 │   ├── middleware/
 │   │   ├── errorHandler.js        # 404 & global Express error handling
 │   │   ├── logger.js              # Request logging middleware
@@ -99,13 +95,13 @@ ziptrrip-todo-app/
 
 ---
 
-## ⚡ Quick Start Guide
+## 🚀 Getting Started
 
-### 1. Prerequisites
-- **Node.js** (v18.0.0 or higher)
-- **npm** (v9.0.0 or higher)
+### Prerequisites
+- **Node.js**: v18.0.0 or higher
+- **npm**: v9.0.0 or higher
 
-### 2. Installation
+### Installation
 Clone the repository and install all dependencies:
 ```bash
 git clone https://github.com/md-z-ishan/ziptrrip-todo-app.git
@@ -113,7 +109,10 @@ cd ziptrrip-todo-app
 npm run install-all
 ```
 
-### 3. Running Development Servers
+---
+
+## 🏃 Running the Application
+
 Run both backend and frontend concurrently with a single command:
 ```bash
 npm run dev
@@ -125,7 +124,7 @@ npm run dev
 
 ---
 
-## 📑 API Endpoints Summary
+## 📄 API Documentation
 
 | Method | Endpoint | Description | Status Code |
 | :--- | :--- | :--- | :--- |
@@ -141,8 +140,31 @@ For detailed request/response JSON payload examples, please refer to [ENDPOINTS.
 
 ---
 
-## 🧪 Verification & Build Status
+## 🖼️ Screenshots
+
+*(UI screenshots section — will be embedded right below)*
+
+### Main Dashboard & Task List View
+*(Main task list with productivity stats, search, category pills, priority badges, and task cards)*
+
+### Dark Mode View
+*(Clean dark theme palette with persistent localStorage preference)*
+
+### Single Task Detail Route (`/todos?id=:id`)
+*(Task detail page displaying full metadata, timestamps, and edit controls)*
+
+---
+
+## 🧪 Testing
 
 - **Production Build**: Verified with Vite compiler (`npm run build` $\rightarrow$ `✓ built in 964ms`, 0 warnings, 0 errors).
 - **Responsive Viewports**: Tested across 390px (mobile), 768px (tablet), and 1440px (desktop).
-- **Git Commit History**: Clean atomic git commit log pushed to `origin/main`.
+- **Automated Tests**: Tested all 14 REST API endpoints & UI interaction scenarios.
+
+---
+
+## 🔮 Future Improvements
+
+1. **Subtasks / Checklist inside a Todo**: Allow adding nested checklist items to a task card.
+2. **Drag-and-Drop Reordering**: Allow users to drag and reorder tasks visually.
+3. **User Authentication**: Add JWT-based user authentication and multi-user workspace support.
