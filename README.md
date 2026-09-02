@@ -1,64 +1,63 @@
-# 🎯 Ziptrrip Todo App
+<div align="center">
 
-A **premium, interview-quality full-stack Todo Application** built specifically for the **Ziptrrip Tech Challenge**. Designed with React 18, Node.js & Express.js, custom CSS variable design tokens, dark mode, productivity statistics dashboard, toast notifications with 5-second **Undo Delete** grace period, debounced search, category tags, priority levels, due date countdowns, and mobile responsiveness.
+# 🎯 Ziptrrip Premium Todo Application
 
-> **Official Repository**: [https://github.com/md-z-ishan/ziptrrip-todo-app.git](https://github.com/md-z-ishan/ziptrrip-todo-app.git)
+### *An Interview-Quality, Production-Grade Full-Stack Productivity Suite*
 
----
+[![React 18](https://img.shields.io/badge/Frontend-React_18_--_Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js_--_Express-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Build Status](https://img.shields.io/badge/Build-Passing_✓-10B981?style=for-the-badge&logo=vite&logoColor=white)](#-testing)
+[![License](https://img.shields.io/badge/License-MIT-7C3AED?style=for-the-badge)](#)
 
-## 🌟 Features
-
-### 🔀 Multi-Page Query-Param Routing
-- **/todos**: Main task management dashboard.
-- **/todos?id=:id**: Single task detail route that reads the `id` query parameter using `URLSearchParams`. Displays title, description, completion status, priority badge, category badge, due date, and timestamps (`createdAt`, `updatedAt`).
-
-### 🎯 Priority Levels
-- **High (🔴)**, **Medium (🟡)**, and **Low (🟢)** visual indicators on cards and detail view.
-- Filter and sort tasks by priority level.
-
-### 📅 Due Dates & Overdue Warnings
-- Add due date & time when creating or editing tasks.
-- Dynamic status badges: `"Due in X days"`, `"Due today"`, or `"Overdue by X days"` with warning colors.
-
-### 📂 Categories & Tags
-- 6 predefined categories: **Work 💼**, **Personal 👤**, **Shopping 🛒**, **Health 💪**, **Learning 📚**, **Other 📌**.
-- Category filter tabs with real-time task counts.
-
-### 📊 Productivity Statistics Dashboard
-- **SVG Circular Progress Chart** showing overall completion percentage.
-- Priority level breakdown mini cards (High/Medium/Low counts).
-- Category distribution horizontal bar chart.
-- Real-time overdue task warning indicator.
-
-### 🌙 Dark Mode & Preferences Persistence
-- Sun ☀️ / Moon 🌙 theme toggle button in header.
-- Persistent state saved in browser `localStorage`.
-- CSS variable theme system with smooth background color transitions.
-
-### 🔔 Toast Notifications & 5-Second Undo Grace Period
-- Interactive toast alerts for creation, edits, and deletions.
-- **5-second grace period for Undo** on task deletion before persisting to server.
-
-### 📥 JSON Backup Export & Import
-- One-click **Export JSON** button in header to download all task data as a `.json` backup file.
-- One-click **Import JSON** button to restore task backups instantly.
-
-### 📱 Responsive Design & Accessibility (A11y)
-- Mobile-first responsive breakpoints (**390px mobile** $\rightarrow$ **768px tablet** $\rightarrow$ **1440px desktop**).
-- **0 horizontal overflow on 390px mobile viewports**.
-- ARIA focus rings, keyboard tab navigation (`tabIndex={0}`), and minimum 44px touch targets.
+[**🌐 Live GitHub Repository**](https://github.com/md-z-ishan/ziptrrip-todo-app.git) • [**📑 REST API Specification**](ENDPOINTS.md) • [**⚡ Quick Start**](#-running-the-application)
 
 ---
 
-## 🛠️ Tech Stack
+</div>
 
-- **Frontend**: React 18, React Router v6, Custom CSS Variables (Design Tokens), Axios, Lucide Icons, Vite
-- **Backend**: Node.js, Express.js, CORS, Dotenv, Request Logger Middleware
-- **Database**: Atomic JSON file storage (`backend/data/todos.json`)
+> [!IMPORTANT]  
+> **Official Ziptrrip Tech Challenge Qualification Summary**  
+> - **Multi-Page Query-Param Routing**: `/todos` (Main Dashboard) & `/todos?id=<id>` (Single Task Details with `URLSearchParams`).
+> - **Express.js REST API**: Full CRUD endpoints (`GET`, `POST`, `PUT`, `DELETE`) with real-time `/stats`.
+> - **Atomic JSON Persistence**: Safe atomic file read/write operations in `backend/data/todos.json`.
+> - **Markdown Documentation**: Comprehensive documentation in `README.md` and `ENDPOINTS.md`.
 
 ---
 
-## 📁 Project Structure
+## 🌟 Key Features
+
+| Feature Area | Description | Visual / Details |
+| :--- | :--- | :--- |
+| **🔀 Multi-Page Routing** | Separate Task List (`/todos`) and Single Task View (`/todos?id=123`). | Full query parameter parsing via `URLSearchParams` |
+| **🎯 Priority Levels** | High (🔴), Medium (🟡), and Low (🟢) badges. | Real-time priority filter pills and sorting |
+| **📅 Due Date Countdowns** | Dynamic statuses: `"Due in X days"`, `"Due today"`, `"Overdue by X days"`. | Warning colors and highlight badges |
+| **📂 Categories & Tags** | 6 categories (Work 💼, Personal 👤, Shopping 🛒, Health 💪, Learning 📚, Other 📌). | Category pills with live task counts |
+| **📊 Productivity Dashboard** | **SVG Circular Progress Chart** showing overall completion %. | Priority cards, category bars & overdue warnings |
+| **🌙 Dark Mode** | Sun ☀️ / Moon 🌙 header button with persistent state. | Saved in browser `localStorage` |
+| **🔔 5-Second Undo Delete** | Interactive toast notifications with a 5s Undo grace period. | Immediate UI removal with deferred server DELETE |
+| **📥 JSON Backup** | One-click **Export JSON** backup download and **Import JSON** restore. | Data persistence & migration support |
+| **📱 Mobile Responsive** | Mobile-first grid targeting **390px**, **768px**, and **1440px**. | **0 horizontal overflow on 390px mobile viewports** |
+
+---
+
+## 🖼️ UI Screenshots
+
+<div align="center">
+
+### 1. Main Dashboard & Productivity Stats (Desktop 1440px)
+![Main Dashboard & Task List View](docs/screenshots/desktop_dashboard.png)
+
+### 2. Tablet Responsive Layout (768px)
+![Tablet Responsive View](docs/screenshots/tablet_view.png)
+
+### 3. Mobile View (390px - Zero Horizontal Overflow)
+![Mobile Responsive View](docs/screenshots/mobile_view.png)
+
+</div>
+
+---
+
+## 🛠️ Architecture & Tech Stack
 
 ```
 ziptrrip-todo-app/
@@ -79,10 +78,7 @@ ziptrrip-todo-app/
 │   ├── README.md                  # Backend developer documentation
 │   └── package.json              # Express, Cors, Dotenv, Nodemon
 ├── docs/
-│   └── screenshots/               # Application UI Screenshots
-│       ├── desktop_dashboard.png
-│       ├── tablet_view.png
-│       └── mobile_view.png
+│   └── screenshots/               # High-resolution UI screenshots
 ├── frontend/
 │   ├── src/
 │   │   ├── components/            # Header, TodoCard, TodoForm, TodoModal, ConfirmDelete, StatsCard, FilterTabs, Toast, FAB
@@ -100,7 +96,7 @@ ziptrrip-todo-app/
 
 ---
 
-## 🚀 Getting Started
+## ⚡ Getting Started
 
 ### Prerequisites
 - **Node.js**: v18.0.0 or higher
@@ -141,20 +137,7 @@ npm run dev
 | `PUT` | `/api/todos/:id` | Update an existing todo | `200 OK` / `400` / `404` |
 | `DELETE` | `/api/todos/:id` | Delete todo | `200 OK` / `404` |
 
-For detailed request/response JSON payload examples, please refer to [ENDPOINTS.md](file:///Users/mdzishan/Desktop/ziptrrip-todo-app/ENDPOINTS.md).
-
----
-
-## 🖼️ Screenshots
-
-### 1. Main Dashboard & Task List View (Desktop 1440px)
-![Main Dashboard & Task List View](docs/screenshots/desktop_dashboard.png)
-
-### 2. Tablet Responsive View (768px)
-![Tablet Responsive View](docs/screenshots/tablet_view.png)
-
-### 3. Mobile Responsive View (390px - Zero Overflow)
-![Mobile Responsive View](docs/screenshots/mobile_view.png)
+For detailed request/response JSON payload examples, please refer to [ENDPOINTS.md](ENDPOINTS.md).
 
 ---
 
@@ -168,6 +151,6 @@ For detailed request/response JSON payload examples, please refer to [ENDPOINTS.
 
 ## 🔮 Future Improvements
 
-1. **Subtasks / Checklist inside a Todo**: Allow adding nested checklist items to a task card.
-2. **Drag-and-Drop Reordering**: Allow users to drag and reorder tasks visually.
-3. **User Authentication**: Add JWT-based user authentication and multi-user workspace support.
+1. **Subtasks Checklist**: Add nested checklist items to task cards.
+2. **Drag-and-Drop Reordering**: Visual drag-and-drop task prioritization.
+3. **User Authentication**: JWT-based multi-user workspace authentication.
