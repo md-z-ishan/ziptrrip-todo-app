@@ -44,13 +44,16 @@
 
 <div align="center">
 
-### 1. Main Dashboard & Productivity Stats (Desktop 1440px)
+### 1. Main Dashboard & Productivity Stats (Desktop 1440px - Dark Theme)
 ![Main Dashboard & Task List View](docs/screenshots/desktop_dashboard.png)
 
-### 2. Tablet Responsive Layout (768px)
-![Tablet Responsive View](docs/screenshots/tablet_view.png)
+### 2. Single Task Detail Route View (`/todos?id=:id`)
+![Single Task Detail Route View](docs/screenshots/task_detail_view.png)
 
-### 3. Mobile View (390px - Zero Horizontal Overflow)
+### 3. Light Theme Palette View
+![Light Theme Palette View](docs/screenshots/light_mode_dashboard.png)
+
+### 4. Mobile Responsive View (390px - Zero Horizontal Overflow)
 ![Mobile Responsive View](docs/screenshots/mobile_view.png)
 
 </div>
@@ -79,6 +82,10 @@ ziptrrip-todo-app/
 │   └── package.json              # Express, Cors, Dotenv, Nodemon
 ├── docs/
 │   └── screenshots/               # High-resolution UI screenshots
+│       ├── desktop_dashboard.png
+│       ├── task_detail_view.png
+│       ├── light_mode_dashboard.png
+│       └── mobile_view.png
 ├── frontend/
 │   ├── src/
 │   │   ├── components/            # Header, TodoCard, TodoForm, TodoModal, ConfirmDelete, StatsCard, FilterTabs, Toast, FAB
