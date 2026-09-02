@@ -78,6 +78,11 @@ ziptrrip-todo-app/
 │   ├── server.js                  # Express app entry point & port fallback handling
 │   ├── README.md                  # Backend developer documentation
 │   └── package.json              # Express, Cors, Dotenv, Nodemon
+├── docs/
+│   └── screenshots/               # Application UI Screenshots
+│       ├── desktop_dashboard.png
+│       ├── tablet_view.png
+│       └── mobile_view.png
 ├── frontend/
 │   ├── src/
 │   │   ├── components/            # Header, TodoCard, TodoForm, TodoModal, ConfirmDelete, StatsCard, FilterTabs, Toast, FAB
@@ -142,16 +147,14 @@ For detailed request/response JSON payload examples, please refer to [ENDPOINTS.
 
 ## 🖼️ Screenshots
 
-*(UI screenshots section — will be embedded right below)*
+### 1. Main Dashboard & Task List View (Desktop 1440px)
+![Main Dashboard & Task List View](docs/screenshots/desktop_dashboard.png)
 
-### Main Dashboard & Task List View
-*(Main task list with productivity stats, search, category pills, priority badges, and task cards)*
+### 2. Tablet Responsive View (768px)
+![Tablet Responsive View](docs/screenshots/tablet_view.png)
 
-### Dark Mode View
-*(Clean dark theme palette with persistent localStorage preference)*
-
-### Single Task Detail Route (`/todos?id=:id`)
-*(Task detail page displaying full metadata, timestamps, and edit controls)*
+### 3. Mobile Responsive View (390px - Zero Overflow)
+![Mobile Responsive View](docs/screenshots/mobile_view.png)
 
 ---
 
