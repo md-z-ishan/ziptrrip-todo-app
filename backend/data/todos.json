@@ -1,5 +1,38 @@
 [
   {
+    "id": "todo-1788307692090-mt1hj8",
+    "title": "Schedule dentist checkup",
+    "description": "Call Dr. Smith's clinic to book routine dental cleaning",
+    "priority": "low",
+    "category": "health",
+    "dueDate": null,
+    "completed": false,
+    "createdAt": "2026-09-02T00:08:12.090Z",
+    "updatedAt": "2026-09-02T00:08:12.090Z"
+  },
+  {
+    "id": "todo-1788307637832-ocx8t9",
+    "title": "Buy groceries for meal prep",
+    "description": "Buy organic vegetables, fruits, almonds, and protein powder",
+    "priority": "medium",
+    "category": "shopping",
+    "dueDate": null,
+    "completed": false,
+    "createdAt": "2026-09-02T00:07:17.832Z",
+    "updatedAt": "2026-09-02T00:07:17.832Z"
+  },
+  {
+    "id": "todo-1788307611720-yo15f4",
+    "title": "Finish internship assignment submission",
+    "description": "Complete final QA pass, documentation review, and GitHub submission",
+    "priority": "high",
+    "category": "work",
+    "dueDate": "2026-09-09T18:30:00.000Z",
+    "completed": false,
+    "createdAt": "2026-09-02T00:06:51.720Z",
+    "updatedAt": "2026-09-02T00:06:51.720Z"
+  },
+  {
     "id": "todo-1",
     "title": "Complete Ziptrrip internship assignment",
     "description": "Build high-quality REST API backend and React frontend",
