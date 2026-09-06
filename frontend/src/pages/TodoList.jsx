@@ -29,6 +29,8 @@ export function TodoList() {
     updateTodo,
     toggleComplete,
     deleteTodoWithUndo,
+    fetchTodos,
+    fetchStats,
   } = useTodos();
 
   const [searchInput, setSearchInput] = useState('');
@@ -80,7 +82,14 @@ export function TodoList() {
 
   return (
     <div>
-      <Header />
+      <Header
+        todos={todos}
+        onImportSuccess={() => {
+          fetchTodos();
+          fetchStats();
+        }}
+      />
+
 
       <main className="container page-wrapper">
         {/* Page Title & Action Header */}

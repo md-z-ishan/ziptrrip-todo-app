@@ -225,3 +225,47 @@ export const deleteTodo = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * POST /api/todos/import
+ * Bulk import todos from JSON array
+ */
+export const importTodos = async (req, res, next) => {
+  try {
+    const items = req.body;
+    if (!Array.isArray(items)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Import data must be a JSON array of todo objects.',
+      });
+    }
+
+    const currentTodos = await readTodos();
+    const now = new Date().toISOString();
+
+    const importedTodos = items.map((item) => ({
+      id: generateId(),
+      title: item.title ? String(item.title).trim() : 'Imported Task',
+      description: item.description ? String(item.description).trim() : '',
+      priority: (item.priority || 'medium').toLowerCase(),
+      category: (item.category || 'other').toLowerCase(),
+      dueDate: item.dueDate ? new Date(item.dueDate).toISOString() : null,
+      completed: Boolean(item.completed),
+      createdAt: item.createdAt || now,
+      updatedAt: now,
+    }));
+
+    const updatedList = [...importedTodos, ...currentTodos];
+    await writeTodos(updatedList);
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully imported ${importedTodos.length} tasks`,
+      data: importedTodos,
+      count: importedTodos.length,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

@@ -5,6 +5,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage.js';
 import { applyTheme } from '../utils/themes.js';
 import { exportTodosToJson, importTodosFromJson } from '../utils/backup.js';
 import { useToast } from '../hooks/useToast.jsx';
+import apiClient from '../utils/apiClient.js';
 
 export function Header({ todos = [], onImportSuccess }) {
   const location = useLocation();
@@ -22,13 +23,25 @@ export function Header({ todos = [], onImportSuccess }) {
     applyTheme(nextTheme);
   };
 
-  const handleExport = () => {
-    if (!todos || todos.length === 0) {
-      addToast({ message: 'No tasks available to export', type: 'info' });
-      return;
+  const handleExport = async () => {
+    try {
+      let exportData = todos;
+      // If no todos passed as prop or empty, fetch all todos directly from backend
+      if (!exportData || exportData.length === 0) {
+        const response = await apiClient.get('/todos');
+        exportData = response.data || [];
+      }
+
+      if (!exportData || exportData.length === 0) {
+        addToast({ message: 'No tasks available to export', type: 'info' });
+        return;
+      }
+
+      exportTodosToJson(exportData);
+      addToast({ message: `📥 Exported ${exportData.length} task(s) to JSON file!`, type: 'success' });
+    } catch (err) {
+      addToast({ message: err.message || 'Failed to export tasks', type: 'error' });
     }
-    exportTodosToJson(todos);
-    addToast({ message: '📥 Todos exported to JSON file!', type: 'success' });
   };
 
   const handleFileChange = async (e) => {
@@ -36,17 +49,24 @@ export function Header({ todos = [], onImportSuccess }) {
     if (!file) return;
 
     try {
-      const importedData = await importTodosFromJson(file);
+      const parsedArray = await importTodosFromJson(file);
+      const response = await apiClient.post('/todos/import', parsedArray);
+
       if (onImportSuccess) {
-        onImportSuccess(importedData);
+        onImportSuccess(response.data);
+      } else {
+        // Refresh page to load new imported data
+        window.location.reload();
       }
-      addToast({ message: `📤 Successfully imported ${importedData.length} tasks!`, type: 'success' });
+
+      addToast({ message: `📤 Successfully imported ${parsedArray.length} tasks!`, type: 'success' });
     } catch (err) {
       addToast({ message: err.message || 'Failed to import JSON file', type: 'error' });
     } finally {
       e.target.value = '';
     }
   };
+
 
   return (
     <header className="app-header">

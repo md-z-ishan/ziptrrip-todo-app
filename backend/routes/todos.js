@@ -6,6 +6,7 @@ import {
   createTodo,
   updateTodo,
   deleteTodo,
+  importTodos,
 } from '../controllers/todoController.js';
 import { validateTodoInput } from '../middleware/validation.js';
 
@@ -13,6 +14,7 @@ const router = express.Router();
 
 // Stats Endpoint (must come before :id route)
 router.get('/stats', getStats);
+router.post('/import', importTodos);
 
 // List & Create Endpoints
 router.get('/', getAllTodos);
@@ -24,3 +26,4 @@ router.put('/:id', validateTodoInput, updateTodo);
 router.delete('/:id', deleteTodo);
 
 export default router;
+

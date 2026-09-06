@@ -1,14 +1,25 @@
 [
   {
+    "id": "todo-1788601320881-ah6byz",
+    "title": "Have to go gym",
+    "description": "Hello remind me",
+    "priority": "high",
+    "category": "personal",
+    "dueDate": "2026-09-16T09:00:00.000Z",
+    "completed": true,
+    "createdAt": "2026-09-05T09:42:00.881Z",
+    "updatedAt": "2026-09-05T09:47:05.951Z"
+  },
+  {
     "id": "todo-1788307692090-mt1hj8",
-    "title": "Schedule dentist checkup",
+    "title": "Schedule dentist checkup in monday",
     "description": "Call Dr. Smith's clinic to book routine dental cleaning",
-    "priority": "low",
+    "priority": "high",
     "category": "health",
     "dueDate": null,
     "completed": false,
     "createdAt": "2026-09-02T00:08:12.090Z",
-    "updatedAt": "2026-09-02T05:02:38.911Z"
+    "updatedAt": "2026-09-06T00:30:12.043Z"
   },
   {
     "id": "todo-1788307637832-ocx8t9",
@@ -53,17 +64,6 @@
     "completed": false,
     "createdAt": "2026-08-31T10:00:00.000Z",
     "updatedAt": "2026-08-31T10:00:00.000Z"
-  },
-  {
-    "id": "todo-3",
-    "title": "Review Express REST API documentation",
-    "description": "Check status codes, middleware routing, and error response structures",
-    "priority": "low",
-    "category": "learning",
-    "dueDate": "2026-09-04T15:00:00.000Z",
-    "completed": false,
-    "createdAt": "2026-08-30T16:00:00.000Z",
-    "updatedAt": "2026-08-30T16:00:00.000Z"
   },
   {
     "id": "todo-4",
