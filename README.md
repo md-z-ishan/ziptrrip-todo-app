@@ -9,7 +9,8 @@
 [![Build Status](https://img.shields.io/badge/Build-Passing_✓-10B981?style=for-the-badge&logo=vite&logoColor=white)](#-testing)
 [![License](https://img.shields.io/badge/License-MIT-7C3AED?style=for-the-badge)](#)
 
-[**🌐 Live GitHub Repository**](https://github.com/md-z-ishan/ziptrrip-todo-app.git) • [**📑 REST API Specification**](ENDPOINTS.md) • [**⚡ Quick Start**](#-running-the-application)
+[**🚀 Live Demo Application**](https://ziptrrip-taskmaster.vercel.app) • [**🌐 Live GitHub Repository**](https://github.com/md-z-ishan/ziptrrip-todo-app.git) • [**📑 REST API Specification**](ENDPOINTS.md)
+
 
 ---
 
