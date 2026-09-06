@@ -20,8 +20,8 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Retry once on fallback URL if port 5000 fails to connect or returns non-API response
-    if (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED' || (error.response && error.response.status === 404)) {
+    // Retry once on fallback URL ONLY if running on localhost
+    if (PRIMARY_API_URL.includes('localhost') && (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED' || (error.response && error.response.status === 404))) {
       if (!originalRequest._retry && originalRequest.baseURL !== FALLBACK_API_URL) {
         originalRequest._retry = true;
         originalRequest.baseURL = FALLBACK_API_URL;
@@ -41,11 +41,12 @@ apiClient.interceptors.response.use(
     }
 
     const formattedError = {
-      message: error.response?.data?.message || 'Network error: Unable to reach Express backend server.',
+      message: error.response?.data?.message || 'Network error: Express backend server is offline. Please deploy backend and set VITE_API_BASE_URL.',
       status: error.response?.status || 500,
     };
     return Promise.reject(formattedError);
   }
 );
+
 
 export default apiClient;
